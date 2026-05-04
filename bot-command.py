@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import ui
 import discord
 from leetcode import leetProblem
 from leetcode import leetUser
@@ -16,6 +17,39 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="leetcode ", intents=intents, help_command=None)
 
 last_slug = None
+hint_num = 0
+empty_hints = []
+
+class DifficultySelectView(ui.View):
+    def __init__(self):
+        super().__init__(timeout=120)
+
+    @ui.select(
+        placeholder="Choose a difficulty...",
+        options=[
+            discord.SelectOption(label="Easy", value="easy"),
+            discord.SelectOption(label="Medium", value="medium"),
+            discord.SelectOption(label="Hard", value="hard"),
+        ]
+    )
+    async def select_difficulty(self, interaction: discord.Interaction, select: ui.Select):
+        global last_slug, empty_hints, hint_num
+        await interaction.response.defer()
+        randomQuestion = randomProblem(select.values[0])
+        last_slug = randomQuestion["titleSlug"]
+        question_id, title, diff, clean_question, _, empty_hints_result = leetProblem(randomQuestion["titleSlug"])
+        if question_id is None:
+            randomQuestion = randomProblem(select.values[0])
+            last_slug = randomQuestion["titleSlug"]
+            question_id, title, diff, clean_question, _, empty_hints_result = leetProblem(randomQuestion["titleSlug"])
+        empty_hints = empty_hints_result
+        hint_num = 0
+        embed = discord.Embed(
+            title=f"#{question_id} - {title} - ({diff})"[:256],
+            description=f"```\n{clean_question}\n```",
+            color=0xFFA500
+        )
+        await interaction.followup.send(embed=embed)
 
 @bot.event
 async def on_ready():
@@ -24,10 +58,12 @@ async def on_ready():
 
 @bot.hybrid_command(name="problem", description="Fetch a specific problem based on its name (e.g. two-sum)")
 async def problem(ctx, problem_name: str):
+    global last_slug, empty_hints, hint_num
     await ctx.defer()
-    global last_slug
     last_slug = problem_name
-    question_id, title, difficulty, clean_question, _ = leetProblem(problem_name)
+    question_id, title, difficulty, clean_question, _, empty_hints_result = leetProblem(problem_name)
+    empty_hints = empty_hints_result
+    hint_num = 0
     embed = discord.Embed(
         title=f"#{question_id} - {title} - ({difficulty})"[:256],
         description=f"```\n{clean_question}\n```",
@@ -45,14 +81,22 @@ async def link(ctx):
 
 @bot.hybrid_command(name="hint", description="Get hints for the last fetched problem")
 async def hint(ctx):
+    global hint_num
     await ctx.defer()
     if last_slug is None:
         await ctx.send("No problem has been fetched")
         return
-    _, _, _, _, hints = leetProblem(last_slug)
+    if not empty_hints:
+        await ctx.send("No hints available for this problem")
+        return
+    if hint_num >= len(empty_hints):
+        await ctx.send("No more hints available")
+        return
+    hint = empty_hints[hint_num]
+    hint_num += 1
     embed = discord.Embed(
-        title=f"Hint:",
-        description=f"{hints}",
+        title=f"Hint {hint_num}/{len(empty_hints)}:",
+        description=f"{hint}",
         color=0xFFA500
     )
     await ctx.send(embed=embed)
@@ -87,10 +131,13 @@ async def user(ctx, name: str):
 
 @bot.hybrid_command(name="daily", description="Fetch the daily problem")
 async def daily(ctx):
+    global last_slug, empty_hints, hint_num
     await ctx.defer()
-    global last_slug
     title, dailyDate, question_id, difficulty, clean_question, slug = dailyProblem()
     last_slug = slug
+    _, _, _, _, _, empty_hints_result = leetProblem(slug)
+    empty_hints = empty_hints_result
+    hint_num = 0
     embed = discord.Embed(
                     title=f"{dailyDate} - #{question_id} - {title} - ({difficulty})"[:256],
                     description=f"```\n{clean_question}\n```",
@@ -99,27 +146,12 @@ async def daily(ctx):
     await ctx.send(embed=embed)
 
 @bot.hybrid_command(name="random", description="Fetch a random problem. Includes a difficulty filter")
-async def random_problem(ctx, difficulty: str = None):
-    await ctx.defer()
-    global last_slug
-    randomQuestion = randomProblem(difficulty)
-    last_slug = randomQuestion["titleSlug"]
-    question_id, title, diff, clean_question, _ = leetProblem(randomQuestion["titleSlug"])
-    if question_id is None:
-        randomQuestion = randomProblem(difficulty)
-        last_slug = randomQuestion["titleSlug"]
-        question_id, title, diff, clean_question, _ = leetProblem(randomQuestion["titleSlug"])
-    embed = discord.Embed(
-        title=f"#{question_id} - {title} - ({diff})"[:256],
-        description=f"```\n{clean_question}\n```",
-        color=0xFFA500
-    )
-    await ctx.send(embed=embed)
+async def random_problem(ctx):
+    view = DifficultySelectView()
+    await ctx.send("**Select a difficulty:**", view=view, ephemeral=True)
 
 @bot.event
 async def on_command_error(ctx, error):
     await ctx.send(f"Error: {error}")
-    #if isinstance(error, commands.CommandNotFound):
-        #await ctx.send("Command not found. Type `leetcode help` or `/help` for a list of commands.")
 
 bot.run(api_key)

@@ -17,10 +17,14 @@ def leetProblem(problem):
         if data["question"] is None:
                return None, None, None, None, None
         clean_question = BeautifulSoup(data["question"], "html.parser").get_text()
-        hints = data["hints"]
+        empty_hints = []
+        for c in data["hints"]:
+               hints = BeautifulSoup(c, "html.parser").get_text()
+               empty_hints.append(hints)
+        hints = "\n".join(empty_hints)
         question_id = data["questionId"]
             
-        return question_id, title, difficulty, clean_question, hints
+        return question_id, title, difficulty, clean_question, hints, empty_hints
        
        
 
