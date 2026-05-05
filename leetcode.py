@@ -3,6 +3,18 @@ import random
 import math
 from bs4 import BeautifulSoup
 
+def safe_get(url, retries=3):
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200 and response.content:
+                try:
+                    return response.json()
+                except requests.exceptions.JSONDecodeError:
+                    continue  # retry on bad JSON (e.g. Render cold start HTML)
+        except requests.exceptions.RequestException:
+            continue
+    return None
 
 def leetProblem(problem):
 

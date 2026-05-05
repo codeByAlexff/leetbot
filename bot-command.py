@@ -62,6 +62,9 @@ async def problem(ctx, problem_name: str):
     await ctx.defer()
     last_slug = problem_name
     question_id, title, difficulty, clean_question, _, empty_hints_result = leetProblem(problem_name)
+    if question_id is None:
+        await ctx.send("⚠️ Could not fetch that problem. Check the slug is correct or the API may be waking up — try again in a few seconds.")
+        return
     empty_hints = empty_hints_result
     hint_num = 0
     embed = discord.Embed(
@@ -133,16 +136,20 @@ async def user(ctx, name: str):
 async def daily(ctx):
     global last_slug, empty_hints, hint_num
     await ctx.defer()
-    title, dailyDate, question_id, difficulty, clean_question, slug = dailyProblem()
+    result = dailyProblem()
+    if result[0] is None:
+        await ctx.send("⚠️ Could not fetch the daily problem. The API may be waking up — try again in a few seconds.")
+        return
+    title, dailyDate, question_id, difficulty, clean_question, slug = result
     last_slug = slug
     _, _, _, _, _, empty_hints_result = leetProblem(slug)
     empty_hints = empty_hints_result
     hint_num = 0
     embed = discord.Embed(
-                    title=f"{dailyDate} - #{question_id} - {title} - ({difficulty})"[:256],
-                    description=f"```\n{clean_question}\n```",
-                    color=0xFFA500
-                )
+        title=f"{dailyDate} - #{question_id} - {title} - ({difficulty})"[:256],
+        description=f"```\n{clean_question}\n```",
+        color=0xFFA500
+    )
     await ctx.send(embed=embed)
 
 @bot.hybrid_command(name="random", description="Fetch a random problem. Includes a difficulty filter")
