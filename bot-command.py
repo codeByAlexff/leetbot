@@ -144,7 +144,7 @@ async def daily(ctx):
     await ctx.defer()
     result = dailyProblem()
     if result[0] is None:
-        await ctx.send("I'm sorry but I could not fetch the daily problem. The API may be waking up — try again in a few seconds.")
+        await ctx.send("I'm sorry but I couldn't fetch the daily problem. The API may be waking up — try again in a few seconds.")
         return
     title, dailyDate, question_id, difficulty, clean_question, slug = result
     last_slug = slug
