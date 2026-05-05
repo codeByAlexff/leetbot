@@ -75,7 +75,7 @@ async def problem(ctx, problem_name: str):
         )
         await ctx.send(embed=embed)
     except KeyError:
-        await.ctx.send("I'm sorry, I couldn't find any problems with that name. Try using the slug format (e.g. `two-sum`)")
+        await ctx.send("I'm sorry, I couldn't find any problems with that name. Try using the slug format (e.g. `two-sum`)")
 
 @bot.hybrid_command(name="link", description="Get the leetcode link for the last fetched problem")
 async def link(ctx):
