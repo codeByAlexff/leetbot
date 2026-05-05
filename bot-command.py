@@ -64,7 +64,7 @@ async def problem(ctx, problem_name: str):
         last_slug = problem_name
         question_id, title, difficulty, clean_question, _, empty_hints_result = leetProblem(problem_name)
         if question_id is None:
-            await ctx.send("⚠️ Could not fetch that problem. Check the slug is correct or the API may be waking up — try again in a few seconds.")
+            await ctx.send("I'm sorry, I couldn't find any problems with that name. Try using the slug format (e.g. `two-sum`)")
             return
         empty_hints = empty_hints_result
         hint_num = 0
@@ -126,14 +126,17 @@ async def help_command(ctx):
 @bot.hybrid_command(name="user", description="Lookup a user's Leetcode information")
 async def user(ctx, name: str):
     await ctx.defer()
-    username, avatar, ranking, github, about = leetUser(name)
-    embed = discord.Embed(
+    try:
+        username, avatar, ranking, github, about = leetUser(name)
+        embed = discord.Embed(
                     title=f"{username} - ({ranking})"[:256],
                     description=f"{github}\b{about}",
                     color=0xFFA500
                 )
-    embed.set_thumbnail(url=avatar)
-    await ctx.send(embed=embed)
+        embed.set_thumbnail(url=avatar)
+        await ctx.send(embed=embed)
+    except KeyError:
+        await ctx.send("I'm sorry, I couldn't find any users with that name...")
 
 @bot.hybrid_command(name="daily", description="Fetch the daily problem")
 async def daily(ctx):
@@ -141,7 +144,7 @@ async def daily(ctx):
     await ctx.defer()
     result = dailyProblem()
     if result[0] is None:
-        await ctx.send("⚠️ Could not fetch the daily problem. The API may be waking up — try again in a few seconds.")
+        await ctx.send("I'm sorry but I could not fetch the daily problem. The API may be waking up — try again in a few seconds.")
         return
     title, dailyDate, question_id, difficulty, clean_question, slug = result
     last_slug = slug
