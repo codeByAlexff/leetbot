@@ -60,19 +60,22 @@ async def on_ready():
 async def problem(ctx, problem_name: str):
     global last_slug, empty_hints, hint_num
     await ctx.defer()
-    last_slug = problem_name
-    question_id, title, difficulty, clean_question, _, empty_hints_result = leetProblem(problem_name)
-    if question_id is None:
-        await ctx.send("⚠️ Could not fetch that problem. Check the slug is correct or the API may be waking up — try again in a few seconds.")
-        return
-    empty_hints = empty_hints_result
-    hint_num = 0
-    embed = discord.Embed(
-        title=f"#{question_id} - {title} - ({difficulty})"[:256],
-        description=f"```\n{clean_question}\n```",
-        color=0xFFA500
-    )
-    await ctx.send(embed=embed)
+    try:
+        last_slug = problem_name
+        question_id, title, difficulty, clean_question, _, empty_hints_result = leetProblem(problem_name)
+        if question_id is None:
+            await ctx.send("⚠️ Could not fetch that problem. Check the slug is correct or the API may be waking up — try again in a few seconds.")
+            return
+        empty_hints = empty_hints_result
+        hint_num = 0
+        embed = discord.Embed(
+            title=f"#{question_id} - {title} - ({difficulty})"[:256],
+            escription=f"```\n{clean_question}\n```",
+            color=0xFFA500
+        )
+        await ctx.send(embed=embed)
+    except KeyError:
+        await.ctx.send("I'm sorry, I couldn't find any problems with that name. Try using the slug format (e.g. `two-sum`)")
 
 @bot.hybrid_command(name="link", description="Get the leetcode link for the last fetched problem")
 async def link(ctx):

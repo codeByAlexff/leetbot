@@ -19,24 +19,24 @@ def safe_get(url, retries=3):
 def leetProblem(problem):
 
         url = f"https://alfa-leetcode-api.onrender.com/select?titleSlug={problem}"
-
-        response = requests.get(url)
-        print(response.status_code)
-        data = response.json()
-
-        title = data["questionTitle"]
-        difficulty = data["difficulty"]
-        if data["question"] is None:
-               return None, None, None, None, None
-        clean_question = BeautifulSoup(data["question"], "html.parser").get_text()
-        empty_hints = []
-        for c in data["hints"]:
-               hints = BeautifulSoup(c, "html.parser").get_text()
-               empty_hints.append(hints)
-        hints = "\n".join(empty_hints)
-        question_id = data["questionId"]
-            
-        return question_id, title, difficulty, clean_question, hints, empty_hints
+        data = safe_get(url)
+        if data is None:
+              return None, None, None, None, None, []
+        try:
+              title = data["questionTitle"]
+              difficulty = data["difficulty"]
+              if data["question"] is None:
+                    return None, None, None, None, None
+              clean_question = BeautifulSoup(data["question"], "html.parser").get_text()
+              empty_hints = []
+              for c in data["hints"]:
+                    hints = BeautifulSoup(c, "html.parser").get_text()
+                    empty_hints.append(hints)
+              hints = "\n".join(empty_hints)
+              question_id = data["questionId"]
+              return question_id, title, difficulty, clean_question, hints, empty_hints
+        except KeyError:
+              return None, None, None, None, None, []
        
        
 
