@@ -21,7 +21,6 @@ A Discord bot that brings LeetCode problems directly into your server. Fetch spe
 |--------|-------------|
 | `/problem <slug>` | Fetch a specific problem (e.g. `two-sum`) |
 | `/random` | Get a random problem |
-| `/random <difficulty>` | Get a random problem by difficulty (`easy`, `medium`, `hard`) |
 | `/daily` | Get today's daily LeetCode challenge |
 | `/hint` | Get hints for the last fetched problem |
 | `/link` | Get a direct link to the last fetched problem |
