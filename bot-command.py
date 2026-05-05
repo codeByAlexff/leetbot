@@ -70,7 +70,7 @@ async def problem(ctx, problem_name: str):
         hint_num = 0
         embed = discord.Embed(
             title=f"#{question_id} - {title} - ({difficulty})"[:256],
-            escription=f"```\n{clean_question}\n```",
+            description=f"```\n{clean_question}\n```",
             color=0xFFA500
         )
         await ctx.send(embed=embed)
@@ -126,17 +126,17 @@ async def help_command(ctx):
 @bot.hybrid_command(name="user", description="Lookup a user's Leetcode information")
 async def user(ctx, name: str):
     await ctx.defer()
-    try:
-        username, avatar, ranking, github, about = leetUser(name)
-        embed = discord.Embed(
+    username, avatar, ranking, github, about = leetUser(name)
+    if username is None:
+        await ctx.send("User not found.")
+        return
+    embed = discord.Embed(
                     title=f"{username} - ({ranking})"[:256],
                     description=f"{github}\b{about}",
                     color=0xFFA500
                 )
-        embed.set_thumbnail(url=avatar)
-        await ctx.send(embed=embed)
-    except KeyError:
-        await ctx.send("I'm sorry, I couldn't find any users with that name...")
+    embed.set_thumbnail(url=avatar)
+    await ctx.send(embed=embed)
 
 @bot.hybrid_command(name="daily", description="Fetch the daily problem")
 async def daily(ctx):
