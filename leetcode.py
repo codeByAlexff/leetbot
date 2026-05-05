@@ -41,18 +41,18 @@ def leetProblem(problem):
        
 
 def leetUser(user):
-        url = f"https://alfa-leetcode-api.onrender.com/{user}"
-
-        response = requests.get(url)
-        data = response.json()
-
+    url = f"https://alfa-leetcode-api.onrender.com/{user}"
+    response = requests.get(url, timeout=10)
+    data = response.json()
+    try:
         username = data["username"]
         avatar = data["avatar"]
         ranking = data["ranking"]
-        github = data["gitHub"]
-        about = data["about"]
-
+        github = data.get("gitHub", "")
+        about = data.get("about", "")
         return username, avatar, ranking, github, about
+    except KeyError:
+        return None, None, None, None, None
 
 def dailyProblem():
         url = "https://alfa-leetcode-api.onrender.com/daily"
