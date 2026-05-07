@@ -4,6 +4,8 @@ A Discord bot that brings LeetCode problems directly into your server. Fetch spe
 
 ---
 
+[Invite Leetbot to your server](https://discord.com/oauth2/authorize?client_id=1500224659189399765&permissions=19456&integration_type=0&scope=bot)
+
 ## Features
 
 - Fetch any LeetCode problem by slug
