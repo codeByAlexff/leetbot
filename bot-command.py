@@ -131,10 +131,12 @@ async def user(ctx, name: str):
         await ctx.send("User not found.")
         return
     embed = discord.Embed(
-                    title=f"{username} - ({ranking})"[:256],
-                    description=f"{totalSolved} - ✅Solved\b\n{totalSubmissions} - ✅Submitted",
+                    title=username,
                     color=0xFFA500
                 )
+    embed.add_field(name="🏆 Ranking", value=ranking, inline=True)
+    embed.add_field(name="✅ Solved", value=totalSolved, inline=True)
+    embed.add_field(name="📨 Submissions", value=totalSubmissions, inline=True)
     embed.set_thumbnail(url=avatar)
     await ctx.send(embed=embed)
 
