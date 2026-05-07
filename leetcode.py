@@ -52,7 +52,7 @@ def leetUser(user):
          avatar = data["avatar"]
          ranking = data["ranking"]
          totalSolved = data2["totalSolved"]
-         totalSubmissions = data2["totalSubmissions"]
+         totalSubmissions = data2["totalSubmissions"]["submissions"]
          return username, avatar, ranking, totalSolved, totalSubmissions
     except (KeyError, TypeError):
          return None, None, None, None, None
