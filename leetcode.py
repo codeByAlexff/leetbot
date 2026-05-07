@@ -44,13 +44,16 @@ def leetUser(user):
     url = f"https://alfa-leetcode-api.onrender.com/{user}"
     response = requests.get(url, timeout=10)
     data = response.json()
+    url2 = f"https://alfa-leetcode-api.onrender.com/{user}/profile"
+    response2 = requests.get(url2, timeout=10)
+    data2 = response2.json()
     try:
          username = data["username"]
          avatar = data["avatar"]
          ranking = data["ranking"]
-         github = data.get("gitHub", "")
-         about = data.get("about", "")
-         return username, avatar, ranking, github, about
+         totalSolved = data2.get["totalSolved"]
+         totalSubmissions = data2.get["totalSubmissions"]
+         return username, avatar, ranking, totalSolved, totalSubmissions
     except (KeyError, TypeError):
          return None, None, None, None, None
 

@@ -126,13 +126,13 @@ async def help_command(ctx):
 @bot.hybrid_command(name="user", description="Lookup a user's Leetcode information")
 async def user(ctx, name: str):
     await ctx.defer()
-    username, avatar, ranking, github, about = leetUser(name)
+    username, avatar, ranking, totalSolved, totalSubmissions = leetUser(name)
     if username is None:
         await ctx.send("User not found.")
         return
     embed = discord.Embed(
                     title=f"{username} - ({ranking})"[:256],
-                    description=f"{github}\b{about}",
+                    description=f"{totalSolved} - ✅Solved\b\n{totalSubmissions} - ✅Submitted",
                     color=0xFFA500
                 )
     embed.set_thumbnail(url=avatar)
