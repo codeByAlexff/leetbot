@@ -40,15 +40,6 @@ A Discord bot that brings LeetCode problems directly into your server. Fetch spe
 
 ---
 
-## Invite the Bot
-
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
-2. Select your application → OAuth2 → URL Generator
-3. Select `bot` and `applications.commands` scopes
-4. Copy the generated URL and open it to invite the bot to your server
-
----
-
 ## Authors
 
 - [@codeByAlexff](https://github.com/codeByAlexff)
